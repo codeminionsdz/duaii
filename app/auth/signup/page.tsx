@@ -78,7 +78,9 @@ export default function SignupPage() {
         },
       })
 
-      if (error) throw error
+      if (error) {
+        throw new Error(error.message || "خطأ في إنشاء الحساب")
+      }
 
       if (data.user) {
         // If pharmacy, create pharmacy profile
@@ -100,9 +102,12 @@ export default function SignupPage() {
           description: "يرجى التحقق من بريدك الإلكتروني لتفعيل الحساب",
         })
 
-        router.push("/auth/verify")
+        setTimeout(() => {
+          router.push("/auth/verify")
+        }, 500)
       }
     } catch (error: unknown) {
+      console.error("Signup error:", error)
       toast({
         title: "خطأ في إنشاء الحساب",
         description: error instanceof Error ? error.message : "حدث خطأ ما",

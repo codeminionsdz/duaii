@@ -23,25 +23,34 @@ export default function LoginPage() {
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
-    const supabase = createClient()
     setIsLoading(true)
 
     try {
-      const { error } = await supabase.auth.signInWithPassword({
+      const supabase = createClient()
+      const { error, data } = await supabase.auth.signInWithPassword({
         email,
         password,
       })
 
-      if (error) throw error
+      if (error) {
+        throw new Error(error.message || "خطأ في تسجيل الدخول")
+      }
+
+      if (!data.session) {
+        throw new Error("فشل إنشاء جلسة التسجيل")
+      }
 
       toast({
         title: "تم تسجيل الدخول بنجاح",
         description: "مرحباً بك في دوائي",
       })
 
-      router.push("/home")
-      router.refresh()
+      // تأخير صغير للسماح للجلسة بالتحديث
+      setTimeout(() => {
+        router.push("/home")
+      }, 500)
     } catch (error: unknown) {
+      console.error("Login error:", error)
       toast({
         title: "خطأ في تسجيل الدخول",
         description: error instanceof Error ? error.message : "حدث خطأ ما",
